@@ -28,7 +28,7 @@ class AuthState with ChangeNotifier {
     httpClient.setErrorHandler((BackendError e) {
       if (e.status == 401 && rootNavigatorKey.currentState != null) {
         logout(rootNavigatorKey.currentContext!,
-            message: 'Your session has expired. Please sign in again.');
+            message: '${e}');
       }
     });
     return this;
@@ -38,10 +38,13 @@ class AuthState with ChangeNotifier {
     toggleLoading(true);
     payload['token_name'] = await deviceIdentifier();
     try {
+      print("prrr");
       final response = BootstrapDataResponse.fromJson(
-          await httpClient.post('/auth/login', payload: payload));
+          await httpClient.post('/auth/login/', payload: payload));
+      print("Response : ${response.data!.user}");
       _setUser(response.data!.user);
-    } finally {
+    }
+    finally {
       toggleLoading(false);
     }
   }
@@ -51,7 +54,7 @@ class AuthState with ChangeNotifier {
     payload['token_name'] = await deviceIdentifier();
     try {
       final response = BootstrapDataResponse.fromJson(
-          await httpClient.post('/auth/register', payload: payload));
+          await httpClient.post('/auth/register/', payload: payload));
       _setUser(response.data!.user);
       return response;
     } finally {
